@@ -7,21 +7,19 @@ import java.io.Serializable;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "patient_details")
 public class Patient implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "firstname")
+    @Column(name = "firstname", nullable = false)
     private String firstname;
-    @Column(name = "lastname")
+    @Column(name = "lastname", nullable = false)
     private String lastname;
-    @Column(name = "gender")
+    @Column(name = "gender", nullable = false)
     private String gender;
-    @Column(name = "birthdate")
+    @Column(name = "birthdate", nullable = false)
     private String birthdate;
     @Column(name = "address")
     private String address;
