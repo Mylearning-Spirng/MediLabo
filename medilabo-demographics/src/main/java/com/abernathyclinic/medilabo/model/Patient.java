@@ -13,8 +13,8 @@ import java.io.Serializable;
 public class Patient implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column(name = "firstname")
     private String firstname;
     @Column(name = "lastname")
