@@ -1,4 +1,3 @@
-// java
 package com.abernathyclinic.medilabo.controller;
 
 import com.abernathyclinic.medilabo.exception.PatientNotFoundException;
@@ -53,7 +52,7 @@ class PatientControllerTest {
 
         when(patientService.create(any(Patient.class))).thenReturn(patient);
 
-        mockMvc.perform(post("/patients")
+        mockMvc.perform(post("/api/patients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(status().isOk())
@@ -69,7 +68,7 @@ class PatientControllerTest {
 
         when(patientService.getAll()).thenReturn(List.of(p1, p2));
 
-        mockMvc.perform(get("/patients"))
+        mockMvc.perform(get("/api/patients"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -85,7 +84,7 @@ class PatientControllerTest {
         Patient p1 = new Patient(1L, "John", "Doe", "M", "1990-01-01", "123 Main St", "111-222-3333");
         when(patientService.getById(1L)).thenReturn(p1);
 
-        mockMvc.perform(get("/patients/1"))
+        mockMvc.perform(get("/api/patients/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstname").value("John"))
@@ -98,7 +97,7 @@ class PatientControllerTest {
     void delete_shouldReturnSuccessMessage() throws Exception {
         doNothing().when(patientService).delete(1L);
 
-        mockMvc.perform(delete("/patients/delete/1"))
+        mockMvc.perform(delete("/api/patients/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Patient Record is deleted"));
 
@@ -117,7 +116,7 @@ class PatientControllerTest {
 
         when(patientService.update(eq(1L), any(Patient.class))).thenReturn(returned);
 
-        mockMvc.perform(put("/patients/update/1")
+        mockMvc.perform(put("/api/patients/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk())
@@ -126,13 +125,14 @@ class PatientControllerTest {
         verify(patientService, times(1)).update(eq(1L), any(Patient.class));
     }
 
-    // Note: if you have a @ControllerAdvice that maps PatientNotFoundException -> 404,
-    // you can register it with MockMvcBuilders.standaloneSetup(...).setControllerAdvice(...)
     @Test
     void getPatientById_whenNotFound_shouldReturn404_ifExceptionHandled() throws Exception {
         when(patientService.getById(99L)).thenThrow(new PatientNotFoundException(99L));
 
-        mockMvc.perform(get("/patients/99"))
+        mockMvc.perform(get("/api/patients/99"))
                 .andExpect(status().isNotFound());
+
+        verify(patientService, times(1)).getById(99L);
     }
+
 }

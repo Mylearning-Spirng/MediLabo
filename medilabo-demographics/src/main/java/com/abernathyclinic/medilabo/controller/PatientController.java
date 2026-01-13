@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/patients")
+@RequestMapping("/api/patients")
 public class PatientController {
 
     private final PatientService patientService;
@@ -32,13 +32,13 @@ public class PatientController {
         return patientService.getById(id);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         patientService.delete(id);
         return "Patient Record is deleted";
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public String update(@PathVariable Long id, @RequestBody Patient patient) {
         patientService.update(id, patient);
         return "Patient Record is updated";
