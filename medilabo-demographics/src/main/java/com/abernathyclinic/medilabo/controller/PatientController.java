@@ -2,8 +2,11 @@ package com.abernathyclinic.medilabo.controller;
 
 import com.abernathyclinic.medilabo.model.Patient;
 import com.abernathyclinic.medilabo.service.PatientService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -16,31 +19,38 @@ public class PatientController {
         this.patientService = patientService;
     }
 
+    // CREATE
     @PostMapping
-    public String create(@RequestBody Patient patient) {
-        patientService.create(patient);
-        return "Patient Record is created";
+    public ResponseEntity<Patient> create(@Valid @RequestBody Patient patient) {
+        Patient created = patientService.create(patient);
+        return ResponseEntity
+                .created(URI.create("/api/patients/" + created.getId()))
+                .body(created);
     }
 
+    // READ ALL
     @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientService.getAll();
+    public ResponseEntity<List<Patient>> getAllPatients() {
+        return ResponseEntity.ok(patientService.getAll());
     }
 
+    // READ ONE
     @GetMapping("/{id}")
-    public Patient getPatientById(@PathVariable Long id) {
-        return patientService.getById(id);
+    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
+        return ResponseEntity.ok(patientService.getById(id));
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         patientService.delete(id);
-        return "Patient Record is deleted";
+        return ResponseEntity.noContent().build(); // 204
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestBody Patient patient) {
-        patientService.update(id, patient);
-        return "Patient Record is updated";
+    public ResponseEntity<Patient> update(@PathVariable Long id, @Valid @RequestBody Patient patient) {
+        Patient updated = patientService.update(id, patient);
+        return ResponseEntity.ok(updated);
     }
 }

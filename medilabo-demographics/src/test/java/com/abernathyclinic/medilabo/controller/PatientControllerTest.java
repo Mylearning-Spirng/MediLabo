@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,7 +37,8 @@ class PatientControllerTest {
 
     @BeforeEach
     void setup() {
-        mockMvc = getBuild();    }
+        mockMvc = getBuild();
+    }
 
     private MockMvc getBuild() {
         return MockMvcBuilders
@@ -45,7 +47,7 @@ class PatientControllerTest {
     }
 
     @Test
-    void create_shouldReturnSuccessMessage() throws Exception {
+    void create_shouldReturnCreatedPatient() throws Exception {
         Patient patient = new Patient(
                 null, "John", "Doe", "M", "1990-01-01", "123 Main St", "111-222-3333"
         );
@@ -55,8 +57,9 @@ class PatientControllerTest {
         mockMvc.perform(post("/api/patients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Patient Record is created"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstname").value("John"))
+                .andExpect(jsonPath("$.lastname").value("Doe"));
 
         verify(patientService, times(1)).create(any(Patient.class));
     }
@@ -70,7 +73,7 @@ class PatientControllerTest {
 
         mockMvc.perform(get("/api/patients"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].firstname").value("John"))
                 .andExpect(jsonPath("$[1].id").value(2))
@@ -94,18 +97,17 @@ class PatientControllerTest {
     }
 
     @Test
-    void delete_shouldReturnSuccessMessage() throws Exception {
+    void delete_shouldReturnNoContent() throws Exception {
         doNothing().when(patientService).delete(1L);
 
         mockMvc.perform(delete("/api/patients/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Patient Record is deleted"));
+                .andExpect(status().isNoContent());
 
         verify(patientService, times(1)).delete(1L);
     }
 
     @Test
-    void update_shouldReturnSuccessMessage() throws Exception {
+    void update_shouldReturnUpdatedPatient() throws Exception {
         Patient updated = new Patient(
                 null, "Jane", "Smith", "F", "1992-02-02", "999 New St", "999-888-7777"
         );
@@ -120,13 +122,14 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Patient Record is updated"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.firstname").value("Jane"));
 
         verify(patientService, times(1)).update(eq(1L), any(Patient.class));
     }
 
     @Test
-    void getPatientById_whenNotFound_shouldReturn404_ifExceptionHandled() throws Exception {
+    void getPatientById_whenNotFound_shouldReturn404_ifHandled() throws Exception {
         when(patientService.getById(99L)).thenThrow(new PatientNotFoundException(99L));
 
         mockMvc.perform(get("/api/patients/99"))
@@ -134,5 +137,4 @@ class PatientControllerTest {
 
         verify(patientService, times(1)).getById(99L);
     }
-
 }

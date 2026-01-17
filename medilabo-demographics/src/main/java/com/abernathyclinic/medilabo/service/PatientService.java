@@ -17,6 +17,7 @@ public class PatientService {
     }
 
     public Patient create(Patient patient) {
+        patient.setId(null); // important: create should not overwrite
         return patientRepository.save(patient);
     }
 
@@ -27,13 +28,6 @@ public class PatientService {
     public Patient getById(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
-    }
-
-    public void delete(Long id) {
-        if (!patientRepository.existsById(id)) {
-            throw new PatientNotFoundException(id);
-        }
-        patientRepository.deleteById(id);
     }
 
     public Patient update(Long id, Patient patient) {
@@ -47,5 +41,10 @@ public class PatientService {
         existing.setPhone(patient.getPhone());
 
         return patientRepository.save(existing);
+    }
+
+    public void delete(Long id) {
+        Patient existing = getById(id); // throws if not found
+        patientRepository.delete(existing);
     }
 }
