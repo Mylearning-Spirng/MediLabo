@@ -109,12 +109,18 @@ export default function App() {
             <option value="M">Male (M)</option>
           </select>
 
-          <input name="birthdate" placeholder="Birthdate * (YYYY-MM-DD)" value={form.birthdate} onChange={onChange} />
+          <input
+            name="birthdate"
+            placeholder="Birthdate * (YYYY-MM-DD)"
+            value={form.birthdate}
+            onChange={onChange}
+          />
           <input name="address" placeholder="Address (optional)" value={form.address} onChange={onChange} />
           <input name="phone" placeholder="Phone (optional)" value={form.phone} onChange={onChange} />
 
           <div className="actions">
             <button type="submit">{editingId ? "Update" : "Create"}</button>
+
             {editingId && (
               <button
                 type="button"
@@ -134,41 +140,45 @@ export default function App() {
       <div className="card">
         <div className="row">
           <h2>Patients</h2>
-          <button type="button" onClick={loadPatients}>Refresh</button>
+          <button type="button" onClick={loadPatients}>
+            Refresh
+          </button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>First</th>
-              <th>Last</th>
-              <th>Gender</th>
-              <th>Birthdate</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {patients.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.firstname}</td>
-                <td>{p.lastname}</td>
-                <td>{p.gender}</td>
-                <td>{p.birthdate}</td>
-                <td>
-                  <button onClick={() => startEdit(p)}>Edit</button>{" "}
-                  <button onClick={() => remove(p.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-            {patients.length === 0 && (
+        <div className="tableWrap">
+          <table>
+            <thead>
               <tr>
-                <td colSpan="6">No patients found.</td>
+                <th>ID</th>
+                <th>First</th>
+                <th>Last</th>
+                <th>Gender</th>
+                <th>Birthdate</th>
+                <th>Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {patients.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.firstname}</td>
+                  <td>{p.lastname}</td>
+                  <td>{p.gender}</td>
+                  <td>{p.birthdate}</td>
+                  <td>
+                    <button onClick={() => startEdit(p)}>Edit</button>{" "}
+                    <button onClick={() => remove(p.id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+              {patients.length === 0 && (
+                <tr>
+                  <td colSpan="6">No patients found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
