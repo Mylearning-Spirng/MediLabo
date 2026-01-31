@@ -1,12 +1,169 @@
-body { font-family: Arial, sans-serif; background: #f4f6f8; }
-.container {max-width: 1100px; width: 95%; margin: 30px auto;}
-.card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 18px; }
-input, select { display: block; width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 14px; border: 1px solid #ccc; border-radius: 6px;}
-table { width:100%; border-collapse: collapse; background: white; }
-th, td { padding:10px; border-bottom:1px solid #ddd; text-align:left; }
-button { padding:8px 12px; margin-right: 6px; cursor:pointer; }
-.actions { margin-top: 10px; display:flex; gap:10px; }
-.row { display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; }
-.error { color: #b91c1c; }
-.tableWrap {width: 100%; overflow-x: auto;}
-table {width: 100%; min-width: 700px; border-collapse: collapse;background: white;}
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+}
+
+.container {
+  max-width: 1100px;
+  width: 95%;
+  margin: 30px auto;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* Table */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  background: white;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Buttons */
+button {
+  padding: 8px 12px;
+  margin-right: 6px;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+}
+
+button:hover {
+  background: #f3f4f6;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 10px 0;
+}
+
+/* ---------- Notes UI additions ---------- */
+
+/* Two-column layout: Patients left, Notes right (stacks on small screens) */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Selected patient badge */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  font-size: 13px;
+}
+
+/* Notes list */
+.noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.noteItem {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.noteMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.noteText {
+  white-space: pre-wrap; /* keeps line breaks */
+  line-height: 1.35;
+}
+
+.noteActions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Small helper text */
+.muted {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Optional: highlight selected patient row if you add className condition */
+tr.selected {
+  background: #eef2ff;
+}

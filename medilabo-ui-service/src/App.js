@@ -11,15 +11,36 @@ const emptyForm = {
   phone: "",
 };
 
+const emptyNoteForm = { note: "" };
+
 export default function App() {
+  // ---------------- Patients ----------------
   const [patients, setPatients] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
 
+  // ---------------- Notes ----------------
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [notes, setNotes] = useState([]);
+  const [noteForm, setNoteForm] = useState(emptyNoteForm);
+  const [editingNoteId, setEditingNoteId] = useState(null); // kept for future (when you add PUT)
+  const [notesError, setNotesError] = useState("");
+
   useEffect(() => {
     loadPatients();
   }, []);
+
+  useEffect(() => {
+    if (!selectedPatient?.id) {
+      setNotes([]);
+      setNoteForm(emptyNoteForm);
+      setEditingNoteId(null);
+      setNotesError("");
+      return;
+    }
+    loadNotes(selectedPatient.id);
+  }, [selectedPatient]);
 
   async function loadPatients() {
     try {
@@ -30,8 +51,22 @@ export default function App() {
     }
   }
 
+  async function loadNotes(patientId) {
+    try {
+      setNotesError("");
+      const res = await api.get(`/api/notes/patient/${patientId}`); // ✅ matches your controller
+      setNotes(res.data);
+    } catch (e) {
+      setNotesError(errMsg(e));
+    }
+  }
+
   function onChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  }
+
+  function onNoteChange(e) {
+    setNoteForm((n) => ({ ...n, [e.target.name]: e.target.value }));
   }
 
   async function onSubmit(e) {
@@ -65,6 +100,37 @@ export default function App() {
     }
   }
 
+  async function onSubmitNote(e) {
+    e.preventDefault();
+    setNotesError("");
+
+    if (!selectedPatient?.id) {
+      setNotesError("Please select a patient first.");
+      return;
+    }
+
+    if (!noteForm.note.trim()) {
+      setNotesError("Note cannot be empty.");
+      return;
+    }
+
+    // ✅ matches CreateNoteRequest in your controller
+    const payload = {
+      patientId: selectedPatient.id,
+      patientLastName: selectedPatient.lastname || null, // optional
+      note: noteForm.note, // keep formatting; don't trim internal new lines
+    };
+
+    try {
+      await api.post("/api/notes", payload); // ✅ matches your controller
+      setNoteForm(emptyNoteForm);
+      setEditingNoteId(null);
+      await loadNotes(selectedPatient.id);
+    } catch (e) {
+      setNotesError(errMsg(e));
+    }
+  }
+
   function startEdit(p) {
     setEditingId(p.id);
     setForm({
@@ -77,15 +143,28 @@ export default function App() {
     });
   }
 
+  function selectPatient(p) {
+    setSelectedPatient(p);
+  }
+
   async function remove(id) {
     if (!window.confirm("Delete this patient?")) return;
     setError("");
     try {
       await api.delete(`/api/patients/${id}`);
+
+      if (selectedPatient?.id === id) {
+        setSelectedPatient(null);
+        setNotes([]);
+        setNoteForm(emptyNoteForm);
+        setEditingNoteId(null);
+      }
+
       if (editingId === id) {
         setEditingId(null);
         setForm(emptyForm);
       }
+
       await loadPatients();
     } catch (e) {
       setError(errMsg(e));
@@ -96,6 +175,7 @@ export default function App() {
     <div className="container">
       <h1>MediLabo – Patient Management</h1>
 
+      {/* Patient Create/Edit */}
       <div className="card">
         <h2>{editingId ? `Edit Patient #${editingId}` : "Create Patient"}</h2>
         {error && <p className="error">{error}</p>}
@@ -115,6 +195,7 @@ export default function App() {
             value={form.birthdate}
             onChange={onChange}
           />
+
           <input name="address" placeholder="Address (optional)" value={form.address} onChange={onChange} />
           <input name="phone" placeholder="Phone (optional)" value={form.phone} onChange={onChange} />
 
@@ -137,47 +218,129 @@ export default function App() {
         </form>
       </div>
 
-      <div className="card">
-        <div className="row">
-          <h2>Patients</h2>
-          <button type="button" onClick={loadPatients}>
-            Refresh
-          </button>
+      {/* Patients + Notes */}
+      <div className="grid2">
+        {/* Patients List */}
+        <div className="card">
+          <div className="row">
+            <h2>Patients</h2>
+            <button type="button" onClick={loadPatients}>
+              Refresh
+            </button>
+          </div>
+
+          <p className="muted">
+            Tip: Click <b>Select</b> to view/add notes for that patient.
+          </p>
+
+          <div className="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>First</th>
+                  <th>Last</th>
+                  <th>Gender</th>
+                  <th>Birthdate</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {patients.map((p) => (
+                  <tr key={p.id} className={selectedPatient?.id === p.id ? "selected" : ""}>
+                    <td>{p.id}</td>
+                    <td>{p.firstname}</td>
+                    <td>{p.lastname}</td>
+                    <td>{p.gender}</td>
+                    <td>{p.birthdate}</td>
+                    <td>
+                      <button type="button" onClick={() => selectPatient(p)}>
+                        Select
+                      </button>
+                      <button type="button" onClick={() => startEdit(p)}>
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => remove(p.id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {patients.length === 0 && (
+                  <tr>
+                    <td colSpan="6">No patients found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>First</th>
-                <th>Last</th>
-                <th>Gender</th>
-                <th>Birthdate</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patients.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.firstname}</td>
-                  <td>{p.lastname}</td>
-                  <td>{p.gender}</td>
-                  <td>{p.birthdate}</td>
-                  <td>
-                    <button onClick={() => startEdit(p)}>Edit</button>{" "}
-                    <button onClick={() => remove(p.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-              {patients.length === 0 && (
-                <tr>
-                  <td colSpan="6">No patients found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Notes Panel (View + Add) */}
+        <div className="card">
+          <div className="row">
+            <h2>Notes</h2>
+            <button
+              type="button"
+              onClick={() => selectedPatient?.id && loadNotes(selectedPatient.id)}
+              disabled={!selectedPatient?.id}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {selectedPatient ? (
+            <p>
+              Selected:{" "}
+              <span className="badge">
+                #{selectedPatient.id} {selectedPatient.firstname} {selectedPatient.lastname}
+              </span>
+            </p>
+          ) : (
+            <p className="muted">Select a patient from the left to view/add notes.</p>
+          )}
+
+          {notesError && <p className="error">{notesError}</p>}
+
+          <form onSubmit={onSubmitNote}>
+            <textarea
+              name="note"
+              placeholder="Write a medical note (formatting preserved)..."
+              value={noteForm.note}
+              onChange={onNoteChange}
+              disabled={!selectedPatient?.id}
+            />
+
+            <div className="actions">
+              <button type="submit" disabled={!selectedPatient?.id}>
+                Add Note
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNoteForm(emptyNoteForm);
+                  setNotesError("");
+                }}
+                disabled={!selectedPatient?.id}
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <div className="noteList">
+            {notes.map((n) => (
+              <div key={n.id} className="noteItem">
+                <div className="noteMeta">
+                  <span>Note ID: {n.id}</span>
+                  {n.createdAt ? <span>{String(n.createdAt)}</span> : null}
+                </div>
+                <div className="noteText">{n.note}</div>
+              </div>
+            ))}
+
+            {selectedPatient?.id && notes.length === 0 && <div className="muted">No notes found for this patient.</div>}
+          </div>
         </div>
       </div>
     </div>
