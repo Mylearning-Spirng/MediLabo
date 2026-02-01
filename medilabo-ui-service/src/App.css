@@ -1,169 +1,220 @@
+/* src/App.css */
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
+  margin: 0;
+  background: #f6f7fb;
+  color: #111;
 }
 
-.container {
-  max-width: 1100px;
-  width: 95%;
-  margin: 30px auto;
+.topbar {
+  height: 56px;
+  background: #111827;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  justify-content: space-between;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 18px;
+.brand {
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
-/* Inputs */
-input,
-select,
-textarea {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin-bottom: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: inherit;
+.navlinks {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
-textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-/* Table */
-.tableWrap {
-  width: 100%;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  min-width: 700px;
-  border-collapse: collapse;
-  background: white;
-}
-
-th,
-td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-
-/* Buttons */
-button {
-  padding: 8px 12px;
-  margin-right: 6px;
-  cursor: pointer;
-  border: 1px solid #d1d5db;
-  background: #fff;
+.navlinks a {
+  color: #e5e7eb;
+  text-decoration: none;
+  padding: 6px 8px;
   border-radius: 8px;
 }
 
-button:hover {
-  background: #f3f4f6;
+.navlinks a:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.appShell {
+  padding: 18px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.actions {
-  margin-top: 10px;
+.page {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.error {
-  color: #b91c1c;
-  margin: 10px 0;
-}
-
-/* ---------- Notes UI additions ---------- */
-
-/* Two-column layout: Patients left, Notes right (stacks on small screens) */
 .grid2 {
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
+  grid-template-columns: 1fr 1.2fr;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 980px) {
   .grid2 {
     grid-template-columns: 1fr;
   }
 }
 
-/* Selected patient badge */
-.badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  width: 100%;
+}
+
+.formGrid {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+input, select {
+  padding: 10px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  background: white;
+}
+
+input:focus, select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147,197,253,0.35);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.spaceBetween {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grow { flex: 1; }
+
+.btn {
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover { opacity: 0.92; }
+
+.btnSmall {
+  padding: 7px 10px;
+  border-radius: 10px;
   font-size: 13px;
 }
 
-/* Notes list */
-.noteList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+.btnGhost {
+  background: transparent;
+  color: #111827;
+  border: 1px solid #e5e7eb;
 }
 
-.noteItem {
-  border: 1px solid #e5e7eb;
+.btnDanger {
+  background: #b91c1c;
+}
+
+.error {
+  background: #fee2e2;
+  color: #7f1d1d;
+  padding: 10px 12px;
   border-radius: 10px;
+  border: 1px solid #fecaca;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.small { font-size: 12px; }
+
+.tableWrap {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pill {
+  font-size: 12px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.riskBox {
+  margin-top: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 12px;
   background: #fafafa;
 }
 
-.noteMeta {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-  font-size: 13px;
-  color: #6b7280;
+.riskValue {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 8px;
 }
 
-.noteText {
-  white-space: pre-wrap; /* keeps line breaks */
-  line-height: 1.35;
-}
-
-.noteActions {
+.details summary {
+  cursor: pointer;
   margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  color: #374151;
 }
 
-/* Small helper text */
-.muted {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-/* Optional: highlight selected patient row if you add className condition */
-tr.selected {
-  background: #eef2ff;
+pre {
+  background: #0b1020;
+  color: #e5e7eb;
+  padding: 12px;
+  border-radius: 12px;
+  overflow: auto;
 }

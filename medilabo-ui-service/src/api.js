@@ -1,16 +1,35 @@
+//import axios from "axios";
+//import { getToken } from "./auth";
+//
+//const api = axios.create({
+//  baseURL: "http://localhost:8080",
+//});
+//
+//api.interceptors.request.use((config) => {
+//  const token = getToken();
+//  if (token) {
+//    config.headers.Authorization = `Bearer ${token}`;
+//  }
+//  return config;
+//});
+//
+//export default api;
+//
+
+// src/api.js
 import axios from "axios";
-
-const USER = "physician";
-const PASS = "password123";
-
-// Basic base64 header: "Basic base64(username:password)"
-const basicAuth = "Basic " + btoa(`${USER}:${PASS}`);
+import { getToken } from "./auth";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080", // gateway
-  headers: {
-    Authorization: basicAuth,
-  },
+  baseURL: "http://localhost:8080",
+});
+
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default api;

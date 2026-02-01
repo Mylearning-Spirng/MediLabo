@@ -11,18 +11,20 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authorities;
+import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, MedicalNoteControllerTest.TestConfig.class})
 @WebMvcTest(MedicalNoteController.class)
 class MedicalNoteControllerTest {
 
@@ -47,7 +49,6 @@ class MedicalNoteControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "physician", roles = {"PHYSICIAN"})
     void getNotes_returnsList() throws Exception {
         MedicalNote note = new MedicalNote();
         note.setId("abc");
@@ -57,7 +58,8 @@ class MedicalNoteControllerTest {
 
         when(service.getByPatientId(1L)).thenReturn(List.of(note));
 
-        mvc.perform(get("/api/notes/patient/1"))
+        mvc.perform(get("/api/notes/patient/1")
+                        .with(jwt().authorities(createAuthorityList("ROLE_PHYSICIAN"))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value("abc"))
@@ -67,7 +69,6 @@ class MedicalNoteControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "physician", roles = {"PHYSICIAN"})
     void add_returns201AndLocationHeader() throws Exception {
         MedicalNote created = new MedicalNote();
         created.setId("n1");
@@ -79,14 +80,15 @@ class MedicalNoteControllerTest {
                 .thenReturn(created);
 
         String body = """
-                {
-                  "patientId": 2,
-                  "patientLastName": "TestBorderline",
-                  "note": "new note"
-                }
-                """;
+      {
+        "patientId": 2,
+        "patientLastName": "TestBorderline",
+        "note": "new note"
+      }
+      """;
 
         mvc.perform(post("/api/notes")
+                        .with(jwt().authorities(createAuthorityList("ROLE_PHYSICIAN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
