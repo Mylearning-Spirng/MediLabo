@@ -136,7 +136,7 @@ public class RiskService {
     }
 
     /**
-     * Implements the exact rules.
+     * Implements the priority rules.
      *
      * Priority order:
      * 1) EARLY_ONSET
