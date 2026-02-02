@@ -2,6 +2,7 @@ package com.abernathyclinic.medilabo_risk_service.controller;
 
 import com.abernathyclinic.medilabo_risk_service.dto.RiskResponseDto;
 import com.abernathyclinic.medilabo_risk_service.service.RiskService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,11 +15,9 @@ public class RiskController {
         this.riskService = riskService;
     }
 
-    @GetMapping("/{patientId}")
-    public RiskResponseDto getRisk(
-            @PathVariable Long patientId,
-            @RequestHeader(value = "Authorization", required = false) String authorization
-    ) {
-        return riskService.calculateRisk(patientId, authorization);
+    @GetMapping("/{id}")
+    public RiskResponseDto risk(@PathVariable Long id,
+                                @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
+        return riskService.assess(id, auth);
     }
 }
