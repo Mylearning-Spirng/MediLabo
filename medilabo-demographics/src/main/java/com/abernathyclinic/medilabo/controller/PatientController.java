@@ -1,12 +1,12 @@
 package com.abernathyclinic.medilabo.controller;
 
+import com.abernathyclinic.medilabo.exception.PatientNotFoundException;
 import com.abernathyclinic.medilabo.model.Patient;
 import com.abernathyclinic.medilabo.service.PatientService;
-import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,38 +19,38 @@ public class PatientController {
         this.patientService = patientService;
     }
 
-    // CREATE
     @PostMapping
-    public ResponseEntity<Patient> create(@Valid @RequestBody Patient patient) {
-        Patient created = patientService.create(patient);
-        return ResponseEntity
-                .created(URI.create("/api/patients/" + created.getId()))
-                .body(created);
+    public ResponseEntity<Patient> create(@RequestBody Patient patient) {
+        Patient saved = patientService.create(patient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // READ ALL
     @GetMapping
-    public ResponseEntity<List<Patient>> getAllPatients() {
+    public ResponseEntity<List<Patient>> getAll() {
         return ResponseEntity.ok(patientService.getAll());
     }
 
-    // READ ONE
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
-        return ResponseEntity.ok(patientService.getById(id));
+        Patient p = patientService.getById(id);
+        return ResponseEntity.ok(p);
     }
 
-    // DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         patientService.delete(id);
-        return ResponseEntity.noContent().build(); // 204
+        return ResponseEntity.noContent().build();
     }
 
-    // UPDATE
-    @PutMapping("/{id}")
-    public ResponseEntity<Patient> update(@PathVariable Long id, @Valid @RequestBody Patient patient) {
+    @PutMapping("{id}")
+    public ResponseEntity<Patient> update(@PathVariable Long id, @RequestBody Patient patient) {
         Patient updated = patientService.update(id, patient);
         return ResponseEntity.ok(updated);
+    }
+
+    // Handle PatientNotFoundException thrown by service methods and return 404
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<Void> handleNotFound(PatientNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

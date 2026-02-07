@@ -15,9 +15,11 @@ public class RiskController {
         this.riskService = riskService;
     }
 
-    @GetMapping("/{id}")
-    public RiskResponseDto risk(@PathVariable Long id,
-                                @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
-        return riskService.assess(id, auth);
+    @GetMapping("/{patientId}")
+    public RiskResponseDto assess(
+            @PathVariable Long patientId,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader
+    ) {
+        return riskService.assess(patientId, authorizationHeader);
     }
 }
