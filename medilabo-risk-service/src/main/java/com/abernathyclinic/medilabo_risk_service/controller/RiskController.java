@@ -15,6 +15,12 @@ public class RiskController {
         this.riskService = riskService;
     }
 
+    /**
+     * Assess the diabetes risk for a patient based on their medical notes and demographics.
+     * @param patientId
+     * @param authorizationHeader
+     * @return
+     */
     @GetMapping("/{patientId}")
     public RiskResponseDto assess(
             @PathVariable Long patientId,
