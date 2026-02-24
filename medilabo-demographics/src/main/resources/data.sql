@@ -1,4 +1,4 @@
-INSERT INTO patient_details (firstname, lastname, gender, birthdate, address, phone)
+INSERT INTO public.patient_details (firstname, lastname, gender, birthdate, address, phone)
 VALUES
 ('Test', 'TestNone', 'F', '1966-12-31', '1 Brookside St', '100-222-3333'),
 ('Test', 'TestBorderline', 'M', '1945-06-24', '2 High St', '200-333-4444'),

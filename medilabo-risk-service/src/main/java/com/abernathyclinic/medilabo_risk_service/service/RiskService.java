@@ -18,10 +18,10 @@ public class RiskService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${patient.service.url}")
+    @Value("${patient.service.base-url}")
     private String patientServiceUrl;
 
-    @Value("${notes.service.url}")
+    @Value("${notes.service.base-url}")
     private String notesServiceUrl;
 
     // (case-insensitive)
@@ -58,6 +58,7 @@ public class RiskService {
     private PatientDto fetchPatient(Long patientId, String authorizationHeader) {
         HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(authorizationHeader));
         try {
+            System.out.println("Fetching patient " + patientId + " from " + patientServiceUrl);
             ResponseEntity<PatientDto> res = restTemplate.exchange(
                     patientServiceUrl + "/api/patients/" + patientId,
                     HttpMethod.GET,

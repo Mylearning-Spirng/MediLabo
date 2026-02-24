@@ -29,4 +29,10 @@ public class MedicalNoteService {
 
         return repo.save(medicalNote);
     }
+    public void deleteNote(String id) {
+        if (!repo.existsById(id)) {
+            throw new RuntimeException("Note not found with id: " + id);
+        }
+        repo.deleteById(id);
+    }
 }

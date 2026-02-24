@@ -36,4 +36,10 @@ public class MedicalNoteController {
         public String patientLastName; // optional
         public String note;
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
+        service.deleteNote(id);
+        return ResponseEntity.noContent().build();
+    }
 }

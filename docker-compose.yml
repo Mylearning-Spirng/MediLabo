@@ -1,0 +1,77 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: diabetesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  auth-service:
+    build: ./medilabo-auth-service
+    ports:
+      - "9000:9000"
+
+  demographics-service:
+    build: ./medilabo-demographics
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/diabetesdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  notes-service:
+    build: ./medilabo-notes
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongo
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/medilabodb
+
+  risk-service:
+    build: ./medilabo-risk-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - demographics-service
+      - notes-service
+    environment:
+      PATIENT_SERVICE_BASE_URL: http://demographics-service:8081
+      NOTES_SERVICE_BASE_URL: http://notes-service:8082
+
+  gateway-service:
+    build: ./medilabo-gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - demographics-service
+      - notes-service
+      - risk-service
+
+  ui-service:
+    build: ./medilabo-ui-service
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway-service
+
+volumes:
+  pgdata:
+  mongodata:
