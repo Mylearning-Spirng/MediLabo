@@ -37,6 +37,7 @@ public class MedicalNoteController {
         public String note;
     }
 
+    // Delete a note by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable String id) {
         service.deleteNote(id);

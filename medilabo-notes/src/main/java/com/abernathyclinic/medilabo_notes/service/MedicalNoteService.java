@@ -20,6 +20,7 @@ public class MedicalNoteService {
         return repo.findByPatientIdOrderByCreatedAtDesc(patientId);
     }
 
+    // This method is called by the controller to add a new medical note for a patient.
     public MedicalNote add(Long patientId, String patientLastName, String noteText) {
         MedicalNote medicalNote = new MedicalNote();
         medicalNote.setPatientId(patientId);

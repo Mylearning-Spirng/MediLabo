@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { login, isLoggedIn } from "../auth";

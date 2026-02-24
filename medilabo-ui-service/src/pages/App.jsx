@@ -1,4 +1,3 @@
-// src/pages/App.jsx
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import "../App.css";
 import { logout } from "../auth";

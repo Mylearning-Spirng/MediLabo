@@ -11,6 +11,12 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    /**
+     * ✅ CORS is needed to allow our React frontend (http://localhost:3000) to call our Spring Boot backend (http://localhost:8080)
+     * ✅ We configure it here in the API Gateway so it applies to all routes
+     * ✅ We allow all methods and headers for simplicity
+     * ✅ We do NOT allow credentials (cookies/sessions) since we are using JWTs for auth
+     */
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();

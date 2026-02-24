@@ -1,4 +1,3 @@
-// src/pages/Notes.jsx
 import { useMemo, useState } from "react";
 import api from "../api";
 

@@ -24,6 +24,13 @@ public class JwtService {
     private final String issuer;
     private final long ttlMinutes;
 
+    /**
+     * Constructs the JwtService by loading the RSA private key and initializing configuration values.
+     *
+     * @param privateKeyResource the Spring Resource pointing to the PEM-encoded PKCS#8 private key file
+     * @param issuer             the issuer string to include in JWT claims
+     * @param ttlMinutes         the time-to-live for generated tokens in minutes
+     */
     public JwtService(
             @Value("${jwt.private-key-location}") Resource privateKeyResource,
             @Value("${jwt.issuer}") String issuer,
@@ -38,6 +45,13 @@ public class JwtService {
         this.ttlMinutes = ttlMinutes;
     }
 
+    /**
+     * Generates a JWT token for the given username and roles.
+     *
+     * @param username the username to include in the token's subject
+     * @param roles    the list of roles to include in the token's claims
+     * @return a signed JWT token as a String
+     */
     public String generateToken(String username, List<String> roles) {
         try {
             Instant now = Instant.now();
@@ -63,6 +77,13 @@ public class JwtService {
         }
     }
 
+    /**
+     * Loads an RSA private key from a PEM-encoded PKCS#8 file.
+     *
+     * @param res the Spring Resource pointing to the PEM file
+     * @return the loaded RSAPrivateKey
+     * @throws Exception if there is an error reading or parsing the key
+     */
     private RSAPrivateKey loadPrivateKeyPkcs8(Resource res) throws Exception {
         String pem = new String(res.getInputStream().readAllBytes(), StandardCharsets.UTF_8)
                 .replace("-----BEGIN PRIVATE KEY-----", "")

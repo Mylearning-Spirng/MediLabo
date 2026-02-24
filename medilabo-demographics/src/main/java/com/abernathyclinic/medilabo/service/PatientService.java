@@ -16,20 +16,24 @@ public class PatientService {
         this.patientRepository = patientRepository;
     }
 
+    // This method is called by the controller to create a new patient.
     public Patient create(Patient patient) {
         // return whatever the repository returns (including generated id)
         return patientRepository.save(patient);
     }
 
+    // This method is called by the controller to get all patients.
     public List<Patient> getAll() {
         return patientRepository.findAll();
     }
 
+    // This method is called by the controller to get a patient by ID.
     public Patient getById(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
     }
 
+    // This method is called by the controller to delete a patient by ID.
     public void delete(Long id) {
         if (!patientRepository.existsById(id)) {
             throw new PatientNotFoundException("Patient not found with id: " + id);
@@ -37,6 +41,7 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
+    // This method is not required by the controller, but it's a common service method to have.
     public Patient update(Long id, Patient updatedPatient) {
         Patient existing = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));

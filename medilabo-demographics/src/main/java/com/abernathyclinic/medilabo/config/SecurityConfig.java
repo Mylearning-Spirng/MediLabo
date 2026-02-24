@@ -8,6 +8,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    // ✅ this is to configure Spring Security without extending WebSecurityConfigurerAdapter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

@@ -24,6 +24,12 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    /**
+     * 1. Authenticate the user using the provided username and password.
+     * 2. If authentication is successful, generate a JWT token containing the username and roles.
+     * 3. Return the token in the response body as {"token": "the_generated_token"}.
+     * 4. If authentication fails, return a 401 Unauthorized status with an appropriate message.
+     */
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> body) {
         try {
