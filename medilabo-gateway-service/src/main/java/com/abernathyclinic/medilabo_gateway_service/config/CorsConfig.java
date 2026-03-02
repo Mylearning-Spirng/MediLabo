@@ -1,5 +1,7 @@
 package com.abernathyclinic.medilabo_gateway_service.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,6 +13,8 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(CorsConfig.class);
+
     /**
      * ✅ CORS is needed to allow our React frontend (http://localhost:3000) to call our Spring Boot backend (http://localhost:8080)
      * ✅ We configure it here in the API Gateway so it applies to all routes
@@ -19,6 +23,7 @@ public class CorsConfig {
      */
     @Bean
     public CorsWebFilter corsWebFilter() {
+        logger.info("Initializing CORS configuration for gateway");
         CorsConfiguration config = new CorsConfiguration();
 
         // ✅ React app origin

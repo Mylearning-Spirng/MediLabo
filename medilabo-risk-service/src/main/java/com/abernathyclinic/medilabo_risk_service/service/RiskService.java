@@ -3,6 +3,8 @@ package com.abernathyclinic.medilabo_risk_service.service;
 import com.abernathyclinic.medilabo_risk_service.dto.MedicalNoteDto;
 import com.abernathyclinic.medilabo_risk_service.dto.PatientDto;
 import com.abernathyclinic.medilabo_risk_service.dto.RiskResponseDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.*;
 
 @Service
 public class RiskService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RiskService.class);
 
     private final RestTemplate restTemplate;
 
@@ -44,12 +48,15 @@ public class RiskService {
     }
 
     public RiskResponseDto assess(Long patientId, String authorizationHeader) {
+        logger.info("Assessing risk for patientId={}", patientId);
         PatientDto patient = fetchPatient(patientId, authorizationHeader);
         List<MedicalNoteDto> notes = fetchNotes(patientId, authorizationHeader);
 
         int triggerCount = countTriggers(notes);
+        logger.info("Found {} triggers for patientId={}", triggerCount, patientId);
         String riskLevel = determineRisk(patient, triggerCount);
 
+        logger.info("Risk for patientId={} determined as {} (triggers={})", patientId, riskLevel, triggerCount);
         return new RiskResponseDto(patientId, riskLevel, triggerCount);
     }
 
@@ -58,7 +65,7 @@ public class RiskService {
     private PatientDto fetchPatient(Long patientId, String authorizationHeader) {
         HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(authorizationHeader));
         try {
-            System.out.println("Fetching patient " + patientId + " from " + patientServiceUrl);
+            logger.debug("Fetching patient {} from {}", patientId, patientServiceUrl);
             ResponseEntity<PatientDto> res = restTemplate.exchange(
                     patientServiceUrl + "/api/patients/" + patientId,
                     HttpMethod.GET,
@@ -70,6 +77,7 @@ public class RiskService {
             }
             return res.getBody();
         } catch (RestClientResponseException e) {
+            logger.error("Failed to fetch patient {}: {}", patientId, e.getResponseBodyAsString());
             throw new IllegalStateException("Failed to fetch patient " + patientId + ": " + e.getResponseBodyAsString(), e);
         }
     }
@@ -77,6 +85,7 @@ public class RiskService {
     private List<MedicalNoteDto> fetchNotes(Long patientId, String authorizationHeader) {
         HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(authorizationHeader));
         try {
+            logger.debug("Fetching notes for patient {} from {}", patientId, notesServiceUrl);
             ResponseEntity<MedicalNoteDto[]> res = restTemplate.exchange(
                     notesServiceUrl + "/api/notes/patient/" + patientId,
                     HttpMethod.GET,
@@ -84,8 +93,11 @@ public class RiskService {
                     MedicalNoteDto[].class
             );
             MedicalNoteDto[] body = res.getBody();
-            return body == null ? List.of() : Arrays.asList(body);
+            List<MedicalNoteDto> list = body == null ? List.of() : Arrays.asList(body);
+            logger.debug("Fetched {} notes for patientId={}", list.size(), patientId);
+            return list;
         } catch (RestClientResponseException e) {
+            logger.error("Failed to fetch notes for patient {}: {}", patientId, e.getResponseBodyAsString());
             throw new IllegalStateException("Failed to fetch notes for patient " + patientId + ": " + e.getResponseBodyAsString(), e);
         }
     }
@@ -113,7 +125,11 @@ public class RiskService {
 
             for (String trigger : TRIGGERS) {
                 String t = trigger.toLowerCase(Locale.ROOT);
-                total += countOccurrences(text, t);
+                int found = countOccurrences(text, t);
+                if (found > 0) {
+                    logger.debug("Note id={} contains {} occurrences of '{}'", note.id, found, t);
+                }
+                total += found;
             }
         }
 

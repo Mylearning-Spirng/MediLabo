@@ -4,6 +4,8 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Component
 public class JwtService {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
     private final RSAPrivateKey privateKey;
     private final String issuer;
@@ -38,7 +42,9 @@ public class JwtService {
     ) {
         try {
             this.privateKey = loadPrivateKeyPkcs8(privateKeyResource);
+            logger.info("Loaded RSA private key for JWT generation from {}", privateKeyResource.getFilename());
         } catch (Exception e) {
+            logger.error("Failed to load RSA private key for JWT generation", e);
             throw new IllegalStateException("Failed to load RSA private key", e);
         }
         this.issuer = issuer;
@@ -71,8 +77,11 @@ public class JwtService {
             );
 
             jwt.sign(new RSASSASigner(privateKey));
-            return jwt.serialize();
+            String token = jwt.serialize();
+            logger.debug("Generated JWT for user={}", username);
+            return token;
         } catch (Exception e) {
+            logger.error("Failed to generate JWT for user=" + username, e);
             throw new IllegalStateException("Failed to generate JWT", e);
         }
     }

@@ -3,6 +3,8 @@ package com.abernathyclinic.medilabo.controller;
 import com.abernathyclinic.medilabo.exception.PatientNotFoundException;
 import com.abernathyclinic.medilabo.model.Patient;
 import com.abernathyclinic.medilabo.service.PatientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/patients")
 public class PatientController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
 
     private final PatientService patientService;
 
@@ -25,7 +29,9 @@ public class PatientController {
      */
     @PostMapping
     public ResponseEntity<Patient> create(@RequestBody Patient patient) {
+        logger.info("Received request to create patient: {} {}", patient.getFirstname(), patient.getLastname());
         Patient saved = patientService.create(patient);
+        logger.debug("Created patient with id={}", saved.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -35,7 +41,10 @@ public class PatientController {
      */
     @GetMapping
     public ResponseEntity<List<Patient>> getAll() {
-        return ResponseEntity.ok(patientService.getAll());
+        logger.info("Received request to list all patients");
+        List<Patient> patients = patientService.getAll();
+        logger.debug("Returning {} patients", patients == null ? 0 : patients.size());
+        return ResponseEntity.ok(patients);
     }
 
     /**
@@ -46,7 +55,9 @@ public class PatientController {
      */
     @GetMapping("{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
+        logger.info("Received request to get patient by id={}", id);
         Patient p = patientService.getById(id);
+        logger.debug("Found patient id={}", p.getId());
         return ResponseEntity.ok(p);
     }
 
@@ -58,7 +69,9 @@ public class PatientController {
      */
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        logger.info("Received request to delete patient id={}", id);
         patientService.delete(id);
+        logger.debug("Deleted patient id={}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -70,13 +83,16 @@ public class PatientController {
      */
     @PutMapping("{id}")
     public ResponseEntity<Patient> update(@PathVariable Long id, @RequestBody Patient patient) {
+        logger.info("Received request to update patient id={} with data for {} {}", id, patient.getFirstname(), patient.getLastname());
         Patient updated = patientService.update(id, patient);
+        logger.debug("Updated patient id={}", updated.getId());
         return ResponseEntity.ok(updated);
     }
 
     // Handle PatientNotFoundException thrown by service methods and return 404
     @ExceptionHandler(PatientNotFoundException.class)
     public ResponseEntity<Void> handleNotFound(PatientNotFoundException ex) {
+        logger.warn("Patient not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

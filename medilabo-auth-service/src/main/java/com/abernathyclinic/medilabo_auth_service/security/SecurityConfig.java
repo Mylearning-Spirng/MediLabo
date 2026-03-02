@@ -1,5 +1,7 @@
 package com.abernathyclinic.medilabo_auth_service.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,9 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     // ✅ this is to configure Spring Security without extending WebSecurityConfigurerAdapter
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        logger.info("Configuring auth service security");
         http
                 .csrf(csrf -> csrf.disable())                 // ✅ stop 403 on POST
                 .cors(cors -> {})                             // ok even if not configured yet
