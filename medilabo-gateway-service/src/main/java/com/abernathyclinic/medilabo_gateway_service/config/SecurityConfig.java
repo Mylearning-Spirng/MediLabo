@@ -12,21 +12,18 @@ public class SecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    /**
-     * ✅ For the API Gateway, we want to allow all requests through without authentication
-     * ✅ This is because the API Gateway is just a proxy and does not handle authentication itself
-     * ✅ The actual authentication is handled by the Auth Service, which will validate JWTs and issue them
-     * ✅ The API Gateway will simply forward requests to the appropriate services based on the URL path
-     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        logger.info("Configuring gateway security (permissive)");
+        logger.info("Configuring gateway security (JWT validation enabled)");
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex
-                        .pathMatchers("/api/auth/**").permitAll()
-                        .anyExchange().permitAll()
+                        .pathMatchers("/api/auth/**").permitAll() // Auth endpoints are public
+                        .pathMatchers("/", "/index.html", "/static/**", "/favicon.ico").permitAll() // UI static resources
+                        .pathMatchers("/**").permitAll() // UI (React) is public
+                        .pathMatchers("/api/**").authenticated() // All other API endpoints require JWT
                 )
+                .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
                 .build();
     }
 }
