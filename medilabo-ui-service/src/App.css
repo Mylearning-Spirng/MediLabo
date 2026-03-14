@@ -124,6 +124,16 @@ input:focus, select:focus {
 
 .btn:hover { opacity: 0.92; }
 
+.btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn:disabled:hover {
+  opacity: 0.6;
+}
+
 .btnSmall {
   padding: 7px 10px;
   border-radius: 10px;

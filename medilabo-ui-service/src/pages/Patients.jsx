@@ -17,16 +17,31 @@ export default function PatientsPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+
   const sortedPatients = useMemo(() => {
     return [...patients].sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
   }, [patients]);
 
-  async function loadPatients() {
+  async function loadPatients(currentPage = page, currentSize = pageSize) {
     setError("");
     setLoading(true);
     try {
-      const res = await api.get("/api/patients");
-      setPatients(res.data || []);
+      const res = await api.get("/api/patients/paged", {
+        params: {
+          page: currentPage,
+          size: currentSize,
+          sortBy: "id",
+          sortDir: "asc"
+        }
+      });
+      setPatients(res.data.content || []);
+      setTotalPages(res.data.totalPages || 0);
+      setTotalElements(res.data.totalElements || 0);
     } catch (e) {
       setError("Failed to load patients.");
       console.error(e);
@@ -37,7 +52,7 @@ export default function PatientsPage() {
 
   useEffect(() => {
     loadPatients();
-  }, []);
+  }, [page, pageSize]);
 
   function onChange(key, value) {
     setForm((p) => ({ ...p, [key]: value }));
@@ -77,7 +92,7 @@ export default function PatientsPage() {
         await api.post("/api/patients", payload);
       }
       resetForm();
-      await loadPatients();
+      await loadPatients(page, pageSize);
     } catch (e2) {
       setError(editingId ? "Update failed." : "Create failed.");
       console.error(e2);
@@ -89,10 +104,27 @@ export default function PatientsPage() {
     setError("");
     try {
       await api.delete(`/api/patients/${id}`);
-      await loadPatients();
+      await loadPatients(page, pageSize);
     } catch (e) {
       setError("Delete failed.");
       console.error(e);
+    }
+  }
+
+  function handlePageSizeChange(newSize) {
+    setPageSize(newSize);
+    setPage(0); // Reset to first page when changing page size
+  }
+
+  function handlePrevPage() {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  }
+
+  function handleNextPage() {
+    if (page < totalPages - 1) {
+      setPage(page + 1);
     }
   }
 
@@ -149,9 +181,6 @@ export default function PatientsPage() {
               <button className="btn btnGhost" type="button" onClick={resetForm}>
                 Clear
               </button>
-              <button className="btn btnGhost" type="button" onClick={loadPatients}>
-                Refresh
-              </button>
             </div>
           </form>
         </div>
@@ -160,6 +189,26 @@ export default function PatientsPage() {
           <div className="row spaceBetween">
             <h2>Patients</h2>
             {loading && <span className="pill">Loading…</span>}
+          </div>
+
+          {/* Pagination Controls - Top */}
+          <div className="row spaceBetween" style={{ marginBottom: 12 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              Page size
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                style={{ width: 70 }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </label>
+            <span className="muted small">
+              Page {totalPages > 0 ? page + 1 : 0} of {totalPages} — {totalElements} items
+            </span>
           </div>
 
           <div className="tableWrap">
@@ -205,7 +254,30 @@ export default function PatientsPage() {
             </table>
           </div>
 
-          <p className="muted small">
+          {/* Pagination Controls - Bottom */}
+          <div className="row spaceBetween" style={{ marginTop: 12 }}>
+            <div className="row">
+              <button
+                className="btn"
+                onClick={handlePrevPage}
+                disabled={page === 0}
+              >
+                Prev
+              </button>
+              <button
+                className="btn"
+                onClick={handleNextPage}
+                disabled={page >= totalPages - 1}
+              >
+                Next
+              </button>
+            </div>
+            <button className="btn btnGhost" onClick={() => loadPatients(page, pageSize)}>
+              Refresh
+            </button>
+          </div>
+
+          <p className="muted small" style={{ marginTop: 12 }}>
             Tip: Go to the <b>Risk</b> tab to fetch diabetes risk for a patient ID.
           </p>
         </div>

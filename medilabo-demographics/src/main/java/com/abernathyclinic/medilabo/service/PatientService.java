@@ -5,6 +5,8 @@ import com.abernathyclinic.medilabo.model.Patient;
 import com.abernathyclinic.medilabo.repository.PatientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,16 @@ public class PatientService {
         List<Patient> all = patientRepository.findAll();
         logger.info("Retrieved {} patients", all.size());
         return all;
+    }
+
+    // This method is called by the controller to get all patients with pagination.
+    public Page<Patient> getAllPaged(Pageable pageable) {
+        logger.debug("Fetching patients with pagination: page={}, size={}",
+                pageable.getPageNumber(), pageable.getPageSize());
+        Page<Patient> page = patientRepository.findAll(pageable);
+        logger.info("Retrieved page {} with {} patients out of {} total",
+                pageable.getPageNumber(), page.getNumberOfElements(), page.getTotalElements());
+        return page;
     }
 
     // This method is called by the controller to get a patient by ID.
