@@ -5,6 +5,8 @@ MediLabo is a microservices-based healthcare application designed to help detect
 The system is built with **Spring Boot microservices**, secured with **JWT authentication**, exposed through a **Spring Cloud Gateway**, and uses a **React frontend** for the UI.
 
 ---
+## GIT HUB REPOSITORY:
+https://github.com/Mylearning-Spirng/MediLabo
 
 ## Project Architecture
 
@@ -72,7 +74,8 @@ Authorization: Bearer <your-jwt-token>
 
 ---## Running the Application
 
-1. Clone the repository
+1. Clone the repository using git clone in terminal:
+https://github.com/Mylearning-Spirng/MediLabo.git
 2. Navigate to the project root
 3. Build and run with Docker Compose:
 ```bash
